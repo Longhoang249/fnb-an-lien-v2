@@ -3,6 +3,7 @@ import { ChatBubble, TypingBubble, type Message } from '@/components/chat/ChatBu
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/lib/authContext'
 import { useGamificationStore } from '@/lib/store/gamificationStore'
+import { invokeAIFunction } from '@/lib/aiAdapter'
 
 const GOLD_COST_PER_REQUEST = 5
 
@@ -34,7 +35,7 @@ function GoldBadge({ amount }: { amount: number }) {
 }
 
 export default function AIChat() {
-  const { user } = useAuth()
+  const { user, sessionActive } = useAuth()
   const { profile, deductGold, addXp } = useGamificationStore()
   const [messages, setMessages] = useState<Message[]>([WELCOME_MSG])
   const [input, setInput] = useState('')
@@ -42,9 +43,7 @@ export default function AIChat() {
   const [error, setError] = useState<string | null>(null)
   const [pendingGold, setPendingGold] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  // Auto-scroll to bottom
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
@@ -70,24 +69,35 @@ export default function AIChat() {
       return
     }
 
-    // Show pending state in header
     setPendingGold(true)
 
     try {
-      // TODO: Replace with actual Supabase Edge Function call
-      // Using mock response for Phase 4 boilerplate
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const { data: sessionData } = await import('@/lib/supabase/client').then(m => m.supabase.auth.getSession())
+      const token = sessionData?.session?.access_token ?? ''
 
-      const aiMsg: Message = {
-        id: generateId(),
-        role: 'assistant',
-        content: `Tiểu Đệ đã nhận được yêu cầu của Đại Ca!\n\n"Với nội dung "${content.trim()}", Tiểu Đệ sẽ tạo một bài viết phù hợp với brand DNA của quán.\n\n📝 **Bài viết gợi ý:**\n\nChào mừng Đại Ca quay lại với Tiểu Đệ! Trong bản V2 này, AI Chat sẽ kết nối với Supabase Edge Functions để tạo content thực sự. Hãy chờ thêm một chút nhé!`,
-        timestamp: new Date(),
+      const result = await invokeAIFunction('content_writer', {
+        feature: 'content_writer',
+        prompt: content.trim(),
+        userId: user.id,
+      }, token, { retries: 2, goldCost: GOLD_COST_PER_REQUEST })
+
+      if (result.success && result.data && typeof result.data === 'object' && 'content' in result.data) {
+        const aiMsg: Message = {
+          id: generateId(),
+          role: 'assistant',
+          content: (result.data as { content: string }).content,
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, aiMsg])
+        addXp(10, user.id)
+      } else {
+        throw new Error(result.error ?? 'Không nhận được phản hồi từ AI')
       }
-      setMessages((prev) => [...prev, aiMsg])
-      addXp(10, user.id)
     } catch (err) {
+      // Rollback gold if needed (handled by deductGold optimistic logic)
       setError(err instanceof Error ? err.message : 'Có lỗi xảy ra')
+      // Remove the failed user message
+      setMessages((prev) => prev.slice(0, -1))
     } finally {
       setIsTyping(false)
       setPendingGold(false)
@@ -123,8 +133,16 @@ export default function AIChat() {
 
       {/* Error banner */}
       {error && (
-        <div className="mx-6 mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
-          {error}
+        <div className="mx-6 mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive flex items-center gap-2">
+          <span>⚠️</span>
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Not authenticated notice */}
+      {!sessionActive && (
+        <div className="mx-6 mt-4 p-3 rounded-lg bg-amber-rich/10 border border-amber-rich/20 text-sm text-amber-rich">
+          Vui lòng đăng nhập để sử dụng AI Chat.
         </div>
       )}
 
@@ -160,7 +178,6 @@ export default function AIChat() {
       <div className="px-6 py-4 border-t border-border bg-surface shrink-0">
         <div className="flex gap-3 items-end">
           <textarea
-            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -173,7 +190,7 @@ export default function AIChat() {
             variant="primary"
             size="md"
             onClick={() => sendMessage(input)}
-            disabled={!input.trim() || isTyping}
+            disabled={!input.trim() || isTyping || !sessionActive}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
