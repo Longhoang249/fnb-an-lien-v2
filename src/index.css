@@ -1,0 +1,132 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Design Tokens (inherited from V1 ── dong-goi-thuong-hieu) ────────────── */
+:root {
+  /* Surfaces */
+  --background: #f7f7f6;
+  --surface: #ffffff;
+  --surface-hover: #f0efed;
+  --border: #e5e4e7;
+  --input-border: #d1cfd6;
+
+  /* Foreground */
+  --foreground: #3e2723;
+  --muted: #9ca3af;
+  --muted-foreground: #6b7280;
+
+  /* Accent — warm gold */
+  --accent: #ffb300;
+  --accent-hover: #e6a200;
+  --accent-foreground: #3e2723;
+
+  /* Destructive */
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+
+  /* Card */
+  --card: #ffffff;
+  --card-foreground: #3e2723;
+
+  /* Ring */
+  --ring: #ffb300;
+
+  /* Shadows */
+  --shadow-soft: 0 10px 40px -10px rgba(62, 39, 35, 0.15);
+  --shadow-card: 0 4px 20px -5px rgba(62, 39, 35, 0.08);
+
+  /* V1 brand color aliases */
+  --primary: #3e2723;
+  --primary-light: #6a4f4b;
+  --primary-lighter: #8d6e63;
+  --cream: #fff8e1;
+  --coffee-foam: #efebe9;
+  --amber-rich: #d84315;
+  --gold: #ffb300;
+  --sage: #a3b899;
+  --brick: #c66b6b;
+
+  /* Typography */
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark {
+  /* Surfaces */
+  --background: #1c1716;
+  --surface: #2d2422;
+  --surface-hover: #3a302d;
+  --border: #4a3f3b;
+  --input-border: #6b5e58;
+
+  /* Foreground */
+  --foreground: #fff8e1;
+  --muted: #9ca3af;
+  --muted-foreground: #a8a29e;
+
+  /* Accent — gold stays gold in dark */
+  --accent: #ffb300;
+  --accent-hover: #ffc933;
+  --accent-foreground: #1c1716;
+
+  /* Destructive */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Card */
+  --card: #2d2422;
+  --card-foreground: #fff8e1;
+
+  /* Ring */
+  --ring: #ffb300;
+
+  /* Shadows */
+  --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 20px -5px rgba(0, 0, 0, 0.3);
+
+  /* V1 brand color aliases — dark variants */
+  --primary: #8d6e63;
+  --primary-light: #6a4f4b;
+  --primary-lighter: #4e3835;
+  --cream: #2d2422;
+  --coffee-foam: #3a302d;
+  --amber-rich: #ff7043;
+  --gold: #ffca28;
+  --sage: #c5d9c2;
+  --brick: #e57373;
+}
+
+/* ── Base resets & globals ─────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Tailwind utility overrides ────────────────────────────────────────────── */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
