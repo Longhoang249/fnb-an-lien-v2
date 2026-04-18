@@ -2,6 +2,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@config "../tailwind.config.ts";
 
 /* ─── Font Loading (non-blocking, font-display:swap via API) ── */
 /* Be Vietnam Pro — loaded via <link rel="preload"> in index.html */
