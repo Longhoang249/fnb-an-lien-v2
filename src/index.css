@@ -1,8 +1,38 @@
 /* ─── Tailwind Base ─────────────────────────────────────────── */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@config "../tailwind.config.ts";
+@import "tailwindcss";
+
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/container-queries";
+
+@theme {
+  --color-primary: #3e2723;
+  --color-primary-light: #6a4f4b;
+  --color-primary-lighter: #8d6e63;
+  --color-background-light: #f7f7f6;
+  --color-background-dark: #1c1716;
+  --color-cream: #fff8e1;
+  --color-cream-dark: #2d2422;
+  --color-coffee-foam: #efebe9;
+  --color-amber-rich: #d84315;
+  --color-gold: #ffb300;
+  --color-sage: #a3b899;
+  --color-brick: #c66b6b;
+  --color-accent: #d97706;
+
+  --font-display: "Be Vietnam Pro", system-ui, sans-serif;
+
+  --radius-DEFAULT: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+  --radius-full: 9999px;
+
+  --shadow-soft: 0 10px 40px -10px rgba(62, 39, 35, 0.15);
+  --shadow-card: 0 4px 20px -5px rgba(62, 39, 35, 0.08);
+  --shadow-inner-light: inset 0 2px 4px 0 rgba(255, 255, 255, 0.3);
+  --shadow-paper: 0 4px 6px -1px rgba(62, 39, 35, 0.05), 0 2px 4px -1px rgba(62, 39, 35, 0.03);
+}
 
 /* ─── Font Loading (non-blocking, font-display:swap via API) ── */
 /* Be Vietnam Pro — loaded via <link rel="preload"> in index.html */
